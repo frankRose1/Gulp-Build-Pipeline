@@ -1,0 +1,25 @@
+{
+  "name": "gulp-build-pipeline",
+  "version": "0.0.1",
+  "description": "Using gulp to create a build process for a front end website.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frankRose1/Gulp-Build-Pipeline.git"
+  },
+  "author": "Frank Rosendorf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frankRose1/Gulp-Build-Pipeline/issues"
+  },
+  "homepage": "https://github.com/frankRose1/Gulp-Build-Pipeline#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.1"
+  }
+}
