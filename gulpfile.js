@@ -28,24 +28,40 @@
     //7)  gulp build command at the command line to run the clean, scripts, 
         //styles, and images tasks with confidence that the clean task completes before the other commands.
 
-    //8) As a developer, I should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
+    //8)should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
 
 const gulp = require('gulp');
 const uglify = require('gulp-uglify'); //for minifying JS files
 const concat = require('gulp-concat'); //combine files
+const rename = require('gulp-rename');
 const maps = require('gulp-sourcemaps');
+const del = require('del');
 
 //take the js files and concat them in a file saved to the js directory, alongside the original files
     //when we concat the files we will refer to this js/app.js
+//also make a source map here before it gets concated
 gulp.task('concatScripts', () => {
-    gulp.src(['js/circle/*.js', 'js/global.js'])
+    return gulp.src([
+        'js/circle/autogrow.js', 
+        'js/circle/circle.js', 
+        'js/global.js'])
+    .pipe(maps.init())
     .pipe(concat('app.js'))
+    .pipe(maps.write('./')) //same dir as app.js
     .pipe(gulp.dest('js'));
 });
 
 //will need concatScripts as a dependency
-gulp.task('minifyScripts', () => {
+gulp.task('minifyScripts', ['concatScripts'], () => {
+    return gulp.src('js/app.js')
+    .pipe(uglify())
+    .pipe(rename('all.min.js'))
+    .pipe(gulp.dest('js'));
+});
 
+//for now just get rid of the optimized JS files being created
+gulp.task("clean", () => {
+    del(['js/all.min.js', 'js/app.js.map', 'js/app.js']);
 });
 
 gulp.task('hello', () => {
