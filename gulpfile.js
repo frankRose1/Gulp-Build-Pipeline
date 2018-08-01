@@ -30,12 +30,18 @@
 
     //8)should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
 
+//By default, gulp-sourcemaps writes the source maps inline in the compiled CSS files. To write them to a separate file, specify a path
+// relative to the gulp.dest() destination in the sourcemaps.write() function.
+
 const gulp = require('gulp');
 const uglify = require('gulp-uglify'); //for minifying JS files
 const concat = require('gulp-concat'); //combine files
 const rename = require('gulp-rename');
 const maps = require('gulp-sourcemaps');
 const del = require('del');
+const sass = require('gulp-sass');
+const cssNano = require('gulp-cssnano');
+const imageMin = require('gulp-imagemin');
 
 //take the js files and concat them in a file saved to the js directory, alongside the original files
     //when we concat the files we will refer to this js/app.js
@@ -45,24 +51,41 @@ gulp.task('concatScripts', () => {
         'js/circle/autogrow.js', 
         'js/circle/circle.js', 
         'js/global.js'])
-    .pipe(maps.init())
-    .pipe(concat('app.js'))
-    .pipe(maps.write('./')) //same dir as app.js
-    .pipe(gulp.dest('js'));
+            .pipe(maps.init())
+            .pipe(concat('app.js'))
+            .pipe(maps.write('./')) //same dir as app.js
+            .pipe(gulp.dest('js'));
 });
 
 //will need concatScripts as a dependency
 gulp.task('minifyScripts', ['concatScripts'], () => {
-    return gulp.src('js/app.js')
-    .pipe(uglify())
-    .pipe(rename('all.min.js'))
-    .pipe(gulp.dest('js'));
+    gulp.src('js/app.js')
+        .pipe(uglify())
+        .pipe(rename('all.min.js'))
+        .pipe(gulp.dest('js'));
+});
+
+//only need the globl.scss as source because it refers to all other sass files
+//save the map to sass temporarily
+gulp.task('compileSass', () => {
+    gulp.src('sass/global.scss')
+        .pipe(maps.init())
+        .pipe(sass())
+        .pipe(maps.write('./'))
+        .pipe(gulp.dest('sass'));
+});
+
+gulp.task('minifyImages', () => {
+    gulp.src('images/*')
+        .pipe(imageMin())
+        .pipe(gulp.dest('newImgs'));
 });
 
 //for now just get rid of the optimized JS files being created
 gulp.task("clean", () => {
     del(['js/all.min.js', 'js/app.js.map', 'js/app.js']);
 });
+
 
 gulp.task('hello', () => {
     console.log('hello world');
