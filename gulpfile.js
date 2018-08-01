@@ -9,7 +9,6 @@
 
 // Steps to Take: 
     //1) npm install should install all of the dependencies for the build process.
-        //--this will involve --save-dev to save them to the dev dependencies
 
     //2)run the gulp scripts command at the command line to 
         //concatenate, minify, and copy all of the project’s JavaScript files into an all.min.js file that is then copied to the dist/scripts folder.
@@ -25,7 +24,7 @@
     //6) I should be able to run the gulp clean command at the command line 
         //to delete all of the files and folders in the dist folder.
 
-    //7)  gulp build command at the command line to run the clean, scripts, 
+    //7) gulp build command at the command line to run the clean, scripts, 
         //styles, and images tasks with confidence that the clean task completes before the other commands.
 
     //8)should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
@@ -43,50 +42,58 @@ const sass = require('gulp-sass');
 const cssNano = require('gulp-cssnano');
 const imageMin = require('gulp-imagemin');
 
-//take the js files and concat them in a file saved to the js directory, alongside the original files
-    //when we concat the files we will refer to this js/app.js
-//also make a source map here before it gets concated
+//sscripts
 gulp.task('concatScripts', () => {
     return gulp.src([
         'js/circle/autogrow.js', 
-        'js/circle/circle.js', 
-        'js/global.js'])
+        'js/circle/circle.js'])
             .pipe(maps.init())
-            .pipe(concat('app.js'))
-            .pipe(maps.write('./')) //same dir as app.js
+            .pipe(concat('global.js'))
+            .pipe(maps.write('./')) //same dir as global.js
             .pipe(gulp.dest('js'));
 });
 
-//will need concatScripts as a dependency
+
 gulp.task('minifyScripts', ['concatScripts'], () => {
-    gulp.src('js/app.js')
+    return gulp.src('js/global.js')
         .pipe(uglify())
         .pipe(rename('all.min.js'))
-        .pipe(gulp.dest('js'));
+        .pipe(gulp.dest('dist/scripts'));
 });
 
+//styles
 //only need the globl.scss as source because it refers to all other sass files
-//save the map to sass temporarily
 gulp.task('compileSass', () => {
-    gulp.src('sass/global.scss')
+    return gulp.src('sass/global.scss')
         .pipe(maps.init())
         .pipe(sass())
         .pipe(maps.write('./'))
-        .pipe(gulp.dest('sass'));
+        .pipe(gulp.dest('styles'));
 });
 
+gulp.task('minifyCss', ['compileSass'], () => {
+    return gulp.src('styles/global.css')
+        .pipe(cssNano())
+        .pipe(rename('all.min.css'))
+        .pipe(gulp.dest('dist/styles'));
+});
+
+//images
 gulp.task('minifyImages', () => {
-    gulp.src('images/*')
+    return gulp.src('images/*')
         .pipe(imageMin())
-        .pipe(gulp.dest('newImgs'));
+        .pipe(gulp.dest('dist/images'));
 });
 
-//for now just get rid of the optimized JS files being created
 gulp.task("clean", () => {
-    del(['js/all.min.js', 'js/app.js.map', 'js/app.js']);
+    del(['dist', 'js/global*.js*', 'styles']);
 });
 
+// gulp build command at the command line to run the clean, scripts, 
+//styles, and images tasks with confidence that the clean task completes before the other commands
+//build should run clean, then run the scripts, styles and images tasks
+gulp.task('build', ['minifyScripts', 'minifyCss', 'minifyImages']);
 
-gulp.task('hello', () => {
-    console.log('hello world');
+gulp.task('default', ['build'], () => {
+    console.log('Build task done');
 });
