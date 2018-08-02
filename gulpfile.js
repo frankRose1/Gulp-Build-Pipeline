@@ -29,10 +29,8 @@
 
     //8)should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
 
-//By default, gulp-sourcemaps writes the source maps inline in the compiled CSS files. To write them to a separate file, specify a path
-// relative to the gulp.dest() destination in the sourcemaps.write() function.
-
 const gulp = require('gulp');
+const browserSync = require('browser-sync');
 const uglify = require('gulp-uglify'); //for minifying JS files
 const concat = require('gulp-concat'); //combine files
 const rename = require('gulp-rename');
@@ -42,7 +40,7 @@ const sass = require('gulp-sass');
 const cssNano = require('gulp-cssnano');
 const imageMin = require('gulp-imagemin');
 
-//sscripts
+//SCRIPTS
 gulp.task('concatScripts', () => {
     return gulp.src([
         'js/circle/autogrow.js', 
@@ -53,16 +51,16 @@ gulp.task('concatScripts', () => {
             .pipe(gulp.dest('js'));
 });
 
-
 gulp.task('minifyScripts', ['concatScripts'], () => {
-    return gulp.src('js/global.js')
+    gulp.src('js/global.js')
         .pipe(uglify())
         .pipe(rename('all.min.js'))
         .pipe(gulp.dest('dist/scripts'));
 });
 
-//styles
-//only need the globl.scss as source because it refers to all other sass files
+gulp.task('scripts', ['minifyScripts']);
+
+//STYLES
 gulp.task('compileSass', () => {
     return gulp.src('sass/global.scss')
         .pipe(maps.init())
@@ -71,16 +69,18 @@ gulp.task('compileSass', () => {
         .pipe(gulp.dest('styles'));
 });
 
-gulp.task('minifyCss', ['compileSass'], () => {
-    return gulp.src('styles/global.css')
+gulp.task('minifyStyles', ['compileSass'], () => {
+    gulp.src('styles/global.css')
         .pipe(cssNano())
         .pipe(rename('all.min.css'))
         .pipe(gulp.dest('dist/styles'));
 });
 
-//images
-gulp.task('minifyImages', () => {
-    return gulp.src('images/*')
+gulp.task('styles', ['minifyStyles']);
+
+//IMAGES
+gulp.task('images', () => {
+    gulp.src('images/*')
         .pipe(imageMin())
         .pipe(gulp.dest('dist/images'));
 });
@@ -89,11 +89,10 @@ gulp.task("clean", () => {
     del(['dist', 'js/global*.js*', 'styles']);
 });
 
-// gulp build command at the command line to run the clean, scripts, 
-//styles, and images tasks with confidence that the clean task completes before the other commands
-//build should run clean, then run the scripts, styles and images tasks
-gulp.task('build', ['minifyScripts', 'minifyCss', 'minifyImages']);
-
-gulp.task('default', ['build'], () => {
-    console.log('Build task done');
+//runs the tasks to concat/minify assets and moved html and icons to the dist directory
+gulp.task('build', ['scripts', 'styles', 'images'], () => {
+    gulp.src(['index.html', 'icons'])
+    .pipe(gulp.dest('dist'));
 });
+
+gulp.task('default', ['build']);
