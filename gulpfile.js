@@ -30,7 +30,7 @@
     //8)should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
 
 const gulp = require('gulp');
-const browserSync = require('browser-sync');
+const browserSync = require('browser-sync').create();
 const uglify = require('gulp-uglify'); //for minifying JS files
 const concat = require('gulp-concat'); //combine files
 const rename = require('gulp-rename');
@@ -85,14 +85,24 @@ gulp.task('images', () => {
         .pipe(gulp.dest('dist/images'));
 });
 
+// ICONS compy the icons folder and the subfolder, must contain all files
+gulp.task('icons', () => {
+    gulp.src(['icons/', 'icons/svg/'])
+})
+
 gulp.task("clean", () => {
     del(['dist', 'js/global*.js*', 'styles']);
 });
 
-//runs the tasks to concat/minify assets and moved html and icons to the dist directory
+//runs the tasks to concat/minify assets and moves html and icons to the dist directory
 gulp.task('build', ['scripts', 'styles', 'images'], () => {
     gulp.src(['index.html', 'icons'])
     .pipe(gulp.dest('dist'));
+
+    //start the server
+    browserSync.init({
+        server: 'dist'
+    });
 });
 
 gulp.task('default', ['build']);

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/frankRose1/Gulp-Build-Pipeline#readme",
   "devDependencies": {
+    "browser-sync": "^2.24.6",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
