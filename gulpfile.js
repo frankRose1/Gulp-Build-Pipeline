@@ -15,32 +15,32 @@ gulp.task('concatScripts', () => {
     return gulp.src([
         'js/circle/autogrow.js', 
         'js/circle/circle.js'])
-            .pipe(maps.init())
             .pipe(concat('global.js'))
-            .pipe(maps.write('./'))
             .pipe(gulp.dest('js'));
 });
 
 gulp.task('scripts', ['concatScripts'], () => {
     return gulp.src('js/global.js')
+        .pipe(maps.init())
         .pipe(uglify())
         .pipe(rename('all.min.js'))
+        .pipe(maps.write('./'))
         .pipe(gulp.dest('dist/scripts'));
 });
 
 gulp.task('compileSass', () => {
     return gulp.src('sass/global.scss')
-        .pipe(maps.init())
         .pipe(sass())
-        .pipe(maps.write('./'))
         .pipe(gulp.dest('styles'));
 });
 
 
 gulp.task('styles', ['compileSass'], () => {
     return gulp.src('styles/global.css')
+        .pipe(maps.init())
         .pipe(cssNano())
         .pipe(rename('all.min.css'))
+        .pipe(maps.write('./'))
         .pipe(gulp.dest('dist/styles'));
 });
 
@@ -63,7 +63,7 @@ gulp.task('html', () => {
 gulp.task('images', () => {
     return gulp.src('images/*')
         .pipe(imageMin())
-        .pipe(gulp.dest('dist/images'));
+        .pipe(gulp.dest('dist/content'));
 });
 
 gulp.task('icons', () => {
