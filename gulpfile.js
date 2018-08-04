@@ -22,7 +22,7 @@ gulp.task('concatScripts', () => {
 });
 
 gulp.task('scripts', ['concatScripts'], () => {
-    gulp.src('js/global.js')
+    return gulp.src('js/global.js')
         .pipe(uglify())
         .pipe(rename('all.min.js'))
         .pipe(gulp.dest('dist/scripts'));
@@ -52,7 +52,7 @@ gulp.task('watchSass', ['styles'], (done) => {
 
 //replace the non optimized scripts and styles
 gulp.task('html', () => {
-    gulp.src('index.html')
+    return gulp.src('index.html')
         .pipe(htmlReplace({
             css: 'styles/all.min.css',
             js: 'scripts/all.min.js'
@@ -61,13 +61,13 @@ gulp.task('html', () => {
 });
 
 gulp.task('images', () => {
-    gulp.src('images/*')
+    return gulp.src('images/*')
         .pipe(imageMin())
         .pipe(gulp.dest('dist/images'));
 });
 
 gulp.task('icons', () => {
-    gulp.src(['icons/**'])
+    return gulp.src(['icons/**'])
         .pipe(gulp.dest('dist/icons'));
 });
 
