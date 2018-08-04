@@ -21,7 +21,6 @@ gulp.task('concatScripts', () => {
             .pipe(gulp.dest('js'));
 });
 
-//scripts task will concat, minify and move scripts to dist
 gulp.task('scripts', ['concatScripts'], () => {
     gulp.src('js/global.js')
         .pipe(uglify())
@@ -37,7 +36,7 @@ gulp.task('compileSass', () => {
         .pipe(gulp.dest('styles'));
 });
 
-//styles task will compile SASS, minify the css, and move it to dist
+
 gulp.task('styles', ['compileSass'], () => {
     return gulp.src('styles/global.css')
         .pipe(cssNano())
@@ -61,7 +60,6 @@ gulp.task('html', () => {
         .pipe(gulp.dest('dist'));
 });
 
-//images task will optimize images and move them to dist
 gulp.task('images', () => {
     gulp.src('images/*')
         .pipe(imageMin())
@@ -79,14 +77,15 @@ gulp.task("clean", () => {
 
 //clean must run before the other tasks are ran
 gulp.task('build', (done) => {
-    runSequence('clean', ['scripts', 'styles', 'images', 'icons', 'html'], done);
+    return runSequence('clean', ['scripts', 'styles', 'images', 'icons', 'html'], done);
 });
 
+//wait for build to finish then launch the server
 gulp.task('default', ['build'], () => {
-    //start the server
+    
     browserSync.init({
         server: 'dist'
     });
 
-    gulp.watch('sass/**/*.scss', ['watchSass']);
+    gulp.watch(['sass/**/*.scss', 'sass/**/*.sass'], ['watchSass']);
 });

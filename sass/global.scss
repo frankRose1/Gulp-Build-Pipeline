@@ -1,6 +1,8 @@
-@import "variables";
-@import "circle/core";
-@import "circle/components";
+@import 'variables';
+
+@import 'circle/core';
+
+@import 'circle/components';
 
 body {
   padding-top: 75px;
@@ -28,7 +30,7 @@ body {
       }
       .circle--avatar {
         float: left;
-        margin-left: -75px;
+        margin-left: -35px;
       }
       img {
         width: 100%;
