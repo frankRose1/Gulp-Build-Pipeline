@@ -13,8 +13,8 @@ const del = require('del');
 const sass = require('gulp-sass');
 const cssNano = require('gulp-cssnano');
 const imageMin = require('gulp-imagemin');
+const htmlReplace = require('gulp-html-replace');
 
-//SCRIPTS
 gulp.task('concatScripts', () => {
     return gulp.src([
         'js/circle/autogrow.js', 
@@ -25,16 +25,14 @@ gulp.task('concatScripts', () => {
             .pipe(gulp.dest('js'));
 });
 
-gulp.task('minifyScripts', ['concatScripts'], () => {
+//scripts task will concat, minify and move scripts to dist
+gulp.task('scripts', ['concatScripts'], () => {
     gulp.src('js/global.js')
         .pipe(uglify())
         .pipe(rename('all.min.js'))
         .pipe(gulp.dest('dist/scripts'));
 });
 
-gulp.task('scripts', ['minifyScripts']);
-
-//STYLES
 gulp.task('compileSass', () => {
     return gulp.src('sass/global.scss')
         .pipe(maps.init())
@@ -43,16 +41,25 @@ gulp.task('compileSass', () => {
         .pipe(gulp.dest('styles'));
 });
 
-gulp.task('minifyStyles', ['compileSass'], () => {
+//styles task will compile SASS, minify the css, and move it to dist
+gulp.task('styles', ['compileSass'], () => {
     gulp.src('styles/global.css')
         .pipe(cssNano())
         .pipe(rename('all.min.css'))
         .pipe(gulp.dest('dist/styles'));
 });
 
-gulp.task('styles', ['minifyStyles']);
+//html will replace the non optimized scripts and styles
+gulp.task('html', () => {
+    gulp.src('index.html')
+        .pipe(htmlReplace({
+            css: 'styles/all.min.css',
+            js: 'scripts/all.min.js'
+        }))
+        .pipe(gulp.dest('dist'));
+});
 
-//IMAGES
+//images task will optimize images and move them to dist
 gulp.task('images', () => {
     gulp.src('images/*')
         .pipe(imageMin())
@@ -64,15 +71,11 @@ gulp.task('icons', () => {
         .pipe(gulp.dest('dist/icons'));
 })
 
-
 gulp.task("clean", () => {
     del(['dist', 'js/global*.js*', 'styles']);
 });
 
-gulp.task('build', ['scripts', 'styles', 'images', 'icons'], () => {
-    gulp.src(['index.html'])
-    .pipe(gulp.dest('dist'));
-
+gulp.task('build', ['scripts', 'styles', 'images', 'icons', 'html'], () => {
     //start the server
     browserSync.init({
         server: 'dist'
