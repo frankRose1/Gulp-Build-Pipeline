@@ -1,10 +1,6 @@
-//7) gulp build command at the command line to run the clean, scripts, 
-//styles, and images tasks with confidence that the clean task completes before the other commands.
-
-//8)should be able to run the gulp command at the command line to run the build task and serve my project using a local web server.
-
 const gulp = require('gulp');
 const browserSync = require('browser-sync').create();
+const runSequence = require('run-sequence');
 const uglify = require('gulp-uglify');
 const concat = require('gulp-concat');
 const rename = require('gulp-rename');
@@ -43,13 +39,19 @@ gulp.task('compileSass', () => {
 
 //styles task will compile SASS, minify the css, and move it to dist
 gulp.task('styles', ['compileSass'], () => {
-    gulp.src('styles/global.css')
+    return gulp.src('styles/global.css')
         .pipe(cssNano())
         .pipe(rename('all.min.css'))
         .pipe(gulp.dest('dist/styles'));
 });
 
-//html will replace the non optimized scripts and styles
+//ensure styles is complete before reloading the browsers
+gulp.task('watchSass', ['styles'], (done) => {
+    browserSync.reload();
+    done();
+});
+
+//replace the non optimized scripts and styles
 gulp.task('html', () => {
     gulp.src('index.html')
         .pipe(htmlReplace({
@@ -69,17 +71,22 @@ gulp.task('images', () => {
 gulp.task('icons', () => {
     gulp.src(['icons/**'])
         .pipe(gulp.dest('dist/icons'));
-})
-
-gulp.task("clean", () => {
-    del(['dist', 'js/global*.js*', 'styles']);
 });
 
-gulp.task('build', ['scripts', 'styles', 'images', 'icons', 'html'], () => {
+gulp.task("clean", () => {
+    return del(['dist', 'dist/**', 'js/global*.js*', 'styles']);
+});
+
+//clean must run before the other tasks are ran
+gulp.task('build', (done) => {
+    runSequence('clean', ['scripts', 'styles', 'images', 'icons', 'html'], done);
+});
+
+gulp.task('default', ['build'], () => {
     //start the server
     browserSync.init({
         server: 'dist'
     });
-});
 
-gulp.task('default', ['build']);
+    gulp.watch('sass/**/*.scss', ['watchSass']);
+});
