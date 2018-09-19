@@ -10,6 +10,7 @@ const sass = require('gulp-sass');
 const cssNano = require('gulp-cssnano');
 const imageMin = require('gulp-imagemin');
 const htmlReplace = require('gulp-html-replace');
+const deploy = require('gulp-gh-pages');
 
 gulp.task('concatScripts', () => {
     return gulp.src([
@@ -78,6 +79,12 @@ gulp.task("clean", () => {
 //clean must run before the other tasks are ran
 gulp.task('build', (done) => {
     return runSequence('clean', ['scripts', 'styles', 'images', 'icons', 'html'], done);
+});
+
+//deploy to gh-pages
+gulp.task('deploy', ['build'], () => {
+    return gulp.src('./dist/**/*')
+    .pipe(deploy());
 });
 
 //wait for build to finish then launch the server

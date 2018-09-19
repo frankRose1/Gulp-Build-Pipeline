@@ -1,5 +1,5 @@
 # Using Gulp to Build a Front End Website
-In this project I set up a build process using gulp to prepare a front end website for deployment.
+In this project I set up a build process using gulp to prepare a front end website for deployment. The website itself is very simple, this project was more about getting practice using Gulp.
 The main objective was to optimize the necessary files needed for deployment, and to launch a local web server that will host the website.
 As an added feature I added a ```watch``` task to watch the sass files for any changes and reload the browser when the file is saved.
 
