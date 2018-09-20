@@ -84,7 +84,7 @@ gulp.task('build', (done) => {
 //deploy to gh-pages
 gulp.task('deploy', ['build'], () => {
     return gulp.src('./dist/**/*')
-    .pipe(deploy());
+        .pipe(deploy());
 });
 
 //wait for build to finish then launch the server
